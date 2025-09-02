@@ -47,6 +47,30 @@
         {
           on = [
             "g"
+            "c"
+          ];
+          run = "cd ~/.config";
+          desc = "Go ~/.config";
+        }
+        {
+          on = [
+            "g"
+            "m"
+          ];
+          run = "cd /mnt";
+          desc = "Go /mnt";
+        }
+        {
+          on = [
+            "g"
+            "u"
+          ];
+          run = "cd /run/media/$USER";
+          desc = "Go /run/media/$USER";
+        }
+        {
+          on = [
+            "g"
             "<Space>"
           ];
           run = "cd --interactive";
