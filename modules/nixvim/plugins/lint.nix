@@ -2,15 +2,17 @@
 {
   programs.nixvim = {
     plugins.lint = {
-      enable = opts.nixvim.lint.enable;
+      enable = opts.nixvim.lint.enable or true;
       lintersByFt = {
-        markdownlint = [ "markdownlint" ];
+        c = [ "clangtidy" ];
+        cpp = [ "clangtidy" ];
         css = [ "eslint_d" ];
         gitcommit = [ "commitlint" ];
         javascript = [ "eslint_d" ];
         javascriptreact = [ "eslint_d" ];
-        json = [ "jsonlint" ];
+        json = [ "jq" ];
         lua = [ "luacheck" ];
+        markdownlint = [ "markdownlint" ];
         nix = [ "nix" ];
         python = [ "ruff" ];
         sh = [ "shellcheck" ];
@@ -21,7 +23,7 @@
       };
       linters = { };
     };
-    extraConfigLua = lib.mkIf opts.nixvim.lint.enable ''
+    extraConfigLua = lib.mkIf (opts.nixvim.lint.enable or true) ''
         -- Linting function
         local lint = require("lint")
         local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })

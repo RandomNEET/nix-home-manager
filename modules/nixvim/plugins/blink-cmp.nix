@@ -8,7 +8,9 @@
           preset = "super-tab";
         };
         sources = {
-          providers = lib.mkIf opts.nixvim.copilot.enable {
+          providers = {
+          }
+          // lib.optionalAttrs ((opts.nixvim.copilot.enable or true) && (opts.nixvim.copilot.cmp or false)) {
             copilot = {
               async = true;
               module = "blink-cmp-copilot";
@@ -21,13 +23,16 @@
             "path"
             "buffer"
           ]
-          ++ lib.optional opts.nixvim.copilot.enable "copilot";
+          ++ lib.optional (
+            (opts.nixvim.copilot.enable or true) && (opts.nixvim.copilot.cmp or false)
+          ) "copilot";
         };
-        cmdline = lib.mkIf opts.nixvim.noice.enable {
+        cmdline = lib.mkIf (opts.nixvim.noice.enable or true) {
           enabled = false;
         };
       };
     };
-    plugins.blink-cmp-copilot.enable = opts.nixvim.copilot.enable;
+    plugins.blink-cmp-copilot.enable =
+      (opts.nixvim.copilot.enable or true) && (opts.nixvim.copilot.cmp or false);
   };
 }

@@ -1,0 +1,36 @@
+{
+  imports = [
+    ../../modules/core
+    ../../modules/aerc
+    ../../modules/bash
+    ../../modules/bat
+    ../../modules/btop
+    ../../modules/cava
+    ../../modules/direnv
+    ../../modules/email
+    ../../modules/eza
+    ../../modules/fastfetch
+    ../../modules/fzf
+    ../../modules/gh
+    ../../modules/git
+    ../../modules/glow
+    ../../modules/htop
+    ../../modules/jq
+    ../../modules/lazygit
+    ../../modules/mbsync
+    ../../modules/newsboat
+    ../../modules/nixvim
+    ../../modules/rbw
+    ../../modules/rigprep
+    ../../modules/rmpc
+    ../../modules/spotify-player
+    ../../modules/tmux
+    ../../modules/trash-cli
+    ../../modules/ttyper
+    ../../modules/xdg
+    ../../modules/yazi
+    ../../modules/yt-dlp
+    ../../modules/zoxide
+    ../../modules/zsh
+  ];
+}

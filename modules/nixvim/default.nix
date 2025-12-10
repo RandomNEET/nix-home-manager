@@ -1,67 +1,65 @@
 {
   inputs,
+  lib,
   pkgs,
   opts,
   ...
 }:
 {
-      imports = [
-        inputs.nixvim.homeModules.nixvim
-        ./core
-        ./plugins
-        ./themes
-      ];
+  imports = [
+    inputs.nixvim.homeModules.nixvim
+    ./core
+    ./plugins
+    ./themes
+  ];
 
-      programs.nixvim = {
-        enable = true;
-        viAlias = true;
-        vimAlias = true;
-        globals.mapleader = " ";
-        clipboard = {
-          register = "unnamedplus";
-          providers = {
-            wl-copy.enable = true;
-            xclip.enable = true;
-          };
-        };
-        withNodeJs = opts.nixvim.withNodeJs;
-        withPerl = opts.nixvim.withPerl;
-        withPython3 = opts.nixvim.withPython3;
-        withRuby = opts.nixvim.withRuby;
-
-        extraPackages =
-          with pkgs;
-          (
-            [
-              ripgrep
-              lynx
-              fd
-              ghostscript
-            ]
-            ++ lib.optionals opts.nixvim.conform.enable [
-              # Formatters
-              nixfmt-rfc-style
-              shfmt
-              stylua
-              prettier
-              prettierd
-              isort
-              black
-            ]
-            ++ lib.optionals opts.nixvim.lint.enable [
-              # Linters
-              commitlint
-              eslint_d
-              luajitPackages.luacheck
-              markdownlint-cli
-              nodePackages.jsonlint
-              pylint
-              ruff
-              shellcheck
-              yamllint
-            ]
-          );
+  programs.nixvim = {
+    enable = true;
+    viAlias = true;
+    vimAlias = true;
+    globals.mapleader = " ";
+    clipboard = {
+      register = "unnamedplus";
+      providers = lib.optionalAttrs ((opts.desktop or "") != "") {
+        wl-copy.enable = true;
+        xclip.enable = true;
       };
+    };
 
-      home.packages = with pkgs; [ ];
+    extraPackages =
+      with pkgs;
+      (
+        [
+          fd
+          ghostscript
+          lynx
+          ripgrep
+        ]
+        ++ lib.optionals (opts.nixvim.conform.enable or true) [
+          # Formatters
+          astyle
+          black
+          isort
+          nixfmt-rfc-style
+          prettier
+          prettierd
+          rustfmt
+          shfmt
+          stylua
+        ]
+        ++ lib.optionals (opts.nixvim.lint.enable or true) [
+          # Linters
+          commitlint
+          eslint_d
+          jq
+          luajitPackages.luacheck
+          markdownlint-cli
+          ruff
+          shellcheck
+          yamllint
+        ]
+      );
+  };
+
+  home.packages = with pkgs; [ ];
 }

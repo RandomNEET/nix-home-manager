@@ -16,7 +16,6 @@
     ./mini.nix
     ./noice.nix
     ./nvim-autopairs.nix
-    ./obsidian.nix
     ./persistence.nix
     ./snacks.nix
     ./treesitter.nix

@@ -1,62 +1,25 @@
+# vim:fileencoding=utf-8:foldmethod=marker
 rec {
   username = "howl";
-  userpasswd = "$6$.FVrKngH1eXjNYi9$lsTAUQvvJyB209fhkf3g5E12iCcgNdDZKW0XTwCp7i3lNwM8gjNq3kRgjW4WIBV68YETysoDCHhKtSIncPT3n1";
   editor = "nvim";
   terminal = "kitty";
   terminalFileManager = "yazi";
-  browser = "firefox";
-  emailClient = "thunderbird";
+  browser = "qutebrowser";
+  theme = "catppuccin-mocha";
   xdg = {
     userDirs = {
-      desktop = null; # null or "$HOME/dsk"
-      documents = "$HOME/doc";
-      download = "$HOME/dls";
-      music = "$HOME/mus";
-      pictures = "$HOME/pic";
-      publicShare = "$HOME/pub";
-      templates = "$HOME/tpl";
-      videos = "$HOME/vid";
+      desktop = null;
+      documents = "/home/${username}/doc";
+      download = "/home/${username}/dls";
+      music = "/home/${username}/mus";
+      pictures = "/home/${username}/pic";
+      publicShare = "/home/${username}/pub";
+      templates = "/home/${username}/tpl";
+      videos = "/home/${username}/vid";
     };
   };
 
-  ssh = {
-    dir = "/home/${username}/.vault/ssh";
-    matchBlocks = {
-      "github.com" = {
-        hostname = "github.com";
-        user = "git";
-        identityFile = "${ssh.dir}/gh-randomneet";
-        addKeysToAgent = "yes";
-      };
-      "nasix" = {
-        hostname = "192.168.0.56";
-        port = 22;
-        user = "howl";
-        identityFile = "${ssh.dir}/nasix";
-        addKeysToAgent = "yes";
-      };
-    };
-    daemon = {
-      enable = true;
-      ports = [
-        22
-      ];
-      authorizedKeysFiles = [ "${ssh.dir}/dix.pub" ];
-      settings = {
-        PasswordAuthentication = false;
-      };
-    };
-    agent.enable = false;
-  };
-
-  gpg = {
-    homedir = "/home/${username}/.gnupg";
-    agent = {
-      enable = true;
-      enableSshSupport = true; # Automatically disable ssh-agent if set to true
-    };
-  };
-
+  # Shell {{{
   zsh = {
     initContent = '''';
 
@@ -68,9 +31,11 @@ rec {
     shellGlobalAliases = {
       G = "| grep";
     };
+
     shellAliases = {
-      update = "home-manager switch --flake /home/${username}/.config/home-manager#${username}";
+      update = "sudo nixos-rebuild switch";
     };
+
     oh-my-zsh = {
       enable = true;
       plugins = [
@@ -79,57 +44,182 @@ rec {
       theme = "simple";
     };
   };
+  # }}}
 
-  nixvim = {
-    withNodeJs = false;
-    withPerl = false;
-    withPython3 = true;
-    withRuby = false;
-
-    lsp.enable = true;
-    treesitter.enable = true; # Automatically disable noice if set to false
-    lint.enable = true;
-    conform.enable = true;
-    copilot.enable = true;
-    noice.enable = true; # Require treesitter
-    snack = {
-      image.enable = true;
-    };
-    obsidian = {
-      workspaces = [
-        {
-          name = "default";
-          path = "~/${obsidian.vaults.default.target}";
-        }
-        {
-          name = "daily";
-          path = "~/${obsidian.vaults.default.target}/daily";
-          overrides = {
-            notes_subdir = "daily";
-          };
-        }
-        {
-          name = "develop";
-          path = "~/${obsidian.vaults.default.target}/develop";
-          overrides = {
-            notes_subdir = "develop";
-          };
-        }
-      ];
-    };
-  };
-
-  git = {
-    userName = "RandomNEET";
-    userEmail = "dev@randomneet.me";
-  };
-
-  obsidian = {
-    vaults = {
-      default = {
-        enable = true;
-        target = "doc/obsidian";
+  # File manager {{{
+  yazi = {
+    keymap = {
+      mgr = {
+        prepend_keymap = [
+          {
+            on = [
+              "g"
+              "d"
+            ];
+            run = "cd ~/dls";
+            desc = "Go ~/dls";
+          }
+          {
+            on = [
+              "g"
+              "r"
+            ];
+            run = "cd ~/repo";
+            desc = "Go ~/repo";
+          }
+          {
+            on = [
+              "g"
+              "u"
+            ];
+            run = "cd /run/media/$USER";
+            desc = "Go /run/media/$USER";
+          }
+        ];
       };
     };
   };
+  # }}}
+
+  # Editor {{{
+  nixvim = {
+    treesitter.enable = true;
+    lsp.enable = true;
+    conform.enable = true;
+    lint.enable = true;
+
+    snacks = {
+      image.enable = true;
+    };
+    noice.enable = true;
+
+    copilot = {
+      enable = true;
+      cmp = false;
+    };
+  };
+  # }}}
+
+  # Mail {{{
+  email = {
+    maildirBasePath = ".mail";
+
+    primary = {
+      name = "RandomNEET";
+      primary = true;
+      maildir.path = "/neet";
+      address = "neet@randomneet.me";
+      userName = "neet@randomneet.me";
+      passwordCommand = "pass migadu/neet";
+      realName = "RandomNEET";
+      gpg = {
+        key = "0xBFA119DF465BFBB1";
+        signByDefault = true;
+        encryptByDefault = false;
+      };
+      flavor = "migadu.com";
+
+      aerc = {
+        enable = true;
+        extraAccounts = {
+          default = "Inbox";
+          folders-sort = "Inbox,Inbox/dev,Inbox/contact,Inbox/selfhost,Inbox/bill,Inbox/cert,Inbox/temp,Archive,Drafts,Sent,Junk,Trash";
+          check-mail = "5m";
+          check-mail-cmd = "systemctl --user start mbsync.service";
+          check-mail-timeout = "30s";
+        };
+      };
+
+      mbsync = {
+        enable = true;
+        create = "maildir";
+      };
+    };
+  };
+
+  mbsync = {
+    program = {
+      groups = {
+        inboxes = {
+          RandomNEET = [
+            "INBOX"
+            "INBOX/dev"
+            "INBOX/contact"
+            "INBOX/selfhost"
+            "INBOX/bill"
+            "INBOX/cert"
+            "INBOX/temp"
+          ];
+        };
+      };
+    };
+    service = {
+      configFile = "/home/${username}/.vault/mail/mbsync/neet";
+      notify = {
+        enable = true;
+        mailDir = "/home/${username}/.mail/neet";
+        countFile = "${mbsync.service.notify.mailDir}/.new";
+      };
+    };
+  };
+  # }}}
+
+  # Media {{{
+  rmpc = {
+    config = {
+      address = "127.0.0.1:6600";
+      password = "None";
+      notify = true;
+    };
+  };
+  # }}}
+
+  # Vault {{{
+  rbw = {
+    settings = {
+      base_url = "https://vaultwarden.scaphium.xyz";
+      email = "selfhost@randomneet.me";
+      lock_timeout = 3600;
+    };
+  };
+  # }}}
+
+  # Misc {{{
+  git = {
+    settings = {
+      user = {
+        name = "RandomNEET";
+        email = "dev@randomneet.me";
+      };
+      init = {
+        defaultBranch = "master";
+      };
+      advice = {
+        defaultBranchName = false;
+      };
+    };
+  };
+
+  newsboat = {
+    browser = "w3m";
+  };
+  # }}}
+
+  # Package {{{
+  packages = [
+    "ffmpeg"
+    "imagemagick"
+    "w3m"
+    "lolcat"
+    "figlet"
+    "fortune"
+    "cowsay"
+    "asciiquarium-transparent"
+    "cbonsai"
+    "cmatrix"
+    "pipes"
+    "tty-clock"
+    "cliwt"
+  ];
+  # }}}
 }

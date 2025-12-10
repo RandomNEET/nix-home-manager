@@ -1,9 +1,4 @@
-{
-  config,
-  pkgs,
-  opts,
-  ...
-}:
+{ config, opts, ... }:
 {
   programs.zsh = {
     enable = true;
@@ -18,10 +13,27 @@
       saveNoDups = true;
       size = 100000;
     };
-    oh-my-zsh = opts.zsh.oh-my-zsh;
-    initContent = opts.zsh.initContent;
-    envExtra = opts.zsh.envExtra;
-    shellGlobalAliases = opts.zsh.shellGlobalAliases;
-    shellAliases = opts.zsh.shellAliases;
+
+    initContent = '''' + (opts.zsh.initContent or "");
+
+    envExtra = '''' + (opts.zsh.envExtra or "");
+
+    shellGlobalAliases = {
+      G = "| grep";
+    }
+    // (opts.zsh.shellGlobalAliases or { });
+
+    shellAliases = {
+      update = "sudo nixos-rebuild switch";
+    }
+    // (opts.zsh.shellAliases or { });
+
+    oh-my-zsh = {
+      enable = opts.zsh.oh-my-zsh.enable or false;
+      plugins = opts.zsh.oh-my-zsh.plugins or [ "vi-mode" ];
+      theme = opts.zsh.oh-my-zsh.theme or "";
+      custom = opts.zsh.oh-my-zsh.custom or "";
+      extraConfig = '''' + (opts.zsh.oh-my-zsh.extraConfig or "");
+    };
   };
 }

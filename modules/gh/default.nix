@@ -5,7 +5,7 @@
     settings = {
       git_protocol = "ssh";
       prompt = "enabled";
-      editor = opts.editor;
+      editor = opts.editor or "";
     };
   };
 }

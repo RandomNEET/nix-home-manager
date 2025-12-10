@@ -1,15 +1,14 @@
-{ pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  opts,
+  ...
+}:
 let
-  dreamsofcode-io-catppuccin-tmux = pkgs.tmuxPlugins.mkTmuxPlugin {
-    pluginName = "catppuccin";
-    version = "unstable-2023-01-06";
-    src = pkgs.fetchFromGitHub {
-      owner = "dreamsofcode-io";
-      repo = "catppuccin-tmux";
-      rev = "b4e0715356f820fc72ea8e8baf34f0f60e891718";
-      sha256 = "sha256-FJHM6LJkiAwxaLd5pnAoF3a7AE1ZqHWoCpUJE0ncCA8=";
-    };
-  };
+  theme = lib.optionalAttrs ((opts.theme or "") != "") (
+    import ./themes/${opts.theme}.nix { inherit pkgs; }
+  );
 in
 {
   programs.tmux = {
@@ -22,13 +21,7 @@ in
     focusEvents = true;
     historyLimit = 100000;
     terminal = "tmux-256color";
-    # terminal = "screen-256color";
-    plugins = with pkgs.tmuxPlugins; [
-      dreamsofcode-io-catppuccin-tmux
-      # catppuccin
-      # sensible
-      vim-tmux-navigator
-    ];
+    plugins = with pkgs.tmuxPlugins; [ vim-tmux-navigator ] ++ (theme.plugins or [ ]);
     extraConfig = ''
       # Options
       set -g @catppuccin_flavour 'mocha'
@@ -85,7 +78,8 @@ in
       bind-key -T copy-mode-vi v send-keys -X begin-selection
       bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
       bind-key -T copy-mode-vi y send-keys -X copy-selection-and-cancel
-    '';
+    ''
+    + (theme.extraConfig or "");
   };
 
   home.shellAliases = {
@@ -97,7 +91,7 @@ in
     ts = "tmux new-session -s";
   };
 
-  programs.zsh = {
+  programs.zsh = lib.mkIf config.programs.zsh.enable {
     initContent = ''
       bindkey -s '^t' "tmux\r"
     '';
